@@ -133,10 +133,10 @@ void main() {
       );
 
       expect(data.imageSize, equals(const Size(1290, 2796)));
-      expect(data.deviceSize, equals(const Size(430, 932)));
+      expect(data.deviceFrameSize, equals(const Size(430, 932)));
       expect(data.canvasSize.width, closeTo(505.9, 0.1)); // 430 / 0.85
       expect(data.canvasSize.height, closeTo(1096.5, 0.1)); // 932 / 0.85
-      expect(data.specs.cornerRadius, equals(58.0));
+      expect(data.specs.cornerRadius, equals(45.0));
       expect(data.specs.deviceSizeScale, equals(0.85));
     });
   });

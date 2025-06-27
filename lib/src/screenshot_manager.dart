@@ -91,14 +91,13 @@ class ScreenshotManager {
       // Debug output
       debugPrint('ScreenshotManager Debug:');
       debugPrint('  screenConfig.deviceSizeScale: ${screenConfig.deviceSizeScale}');
-      debugPrint(
-        '  deviceSpecs.deviceSizeScale: ${deviceSpecs.deviceSizeScale}',
-      ); // TODO: Rename in DeviceSpecs if needed
+      debugPrint('  deviceSpecs.deviceSizeScale: ${deviceSpecs.deviceSizeScale}');
       debugPrint('  deviceSpecs.canvasSize: ${deviceSpecs.canvasSize}');
       debugPrint('  deviceSpecs.deviceSize: ${deviceSpecs.deviceSize}');
+      debugPrint('  deviceSpecs.imageSize: ${deviceSpecs.imageSize}');
 
-      // Use the direct capture approach
-      final imageBytes = await _directCaptureWidget(frameWidget, deviceSpecs.canvasSize, pixelRatio);
+      // Use the direct capture approach with final output size
+      final imageBytes = await _directCaptureWidget(frameWidget, deviceSpecs.canvasSize, deviceSpecs.imageSize);
 
       if (imageBytes == null) {
         throw Exception('Failed to capture widget as image');
@@ -128,16 +127,29 @@ class ScreenshotManager {
   }
 
   /// Direct capture approach using RenderRepaintBoundary
-  Future<Uint8List?> _directCaptureWidget(Widget widget, Size size, double pixelRatio) async {
+  Future<Uint8List?> _directCaptureWidget(Widget widget, Size canvasSize, Size finalOutputSize) async {
     try {
+      // Calculate the pixel ratio needed to get from canvas size to final output size
+      final pixelRatioX = finalOutputSize.width / canvasSize.width;
+      final pixelRatioY = finalOutputSize.height / canvasSize.height;
+
+      // Use the average to maintain aspect ratio, or use the minimum to ensure we don't exceed bounds
+      final calculatedPixelRatio = (pixelRatioX + pixelRatioY) / 2;
+
+      debugPrint('Size calculation:');
+      debugPrint('  canvasSize: $canvasSize');
+      debugPrint('  finalOutputSize: $finalOutputSize');
+      debugPrint('  pixelRatioX: $pixelRatioX, pixelRatioY: $pixelRatioY');
+      debugPrint('  calculatedPixelRatio: $calculatedPixelRatio');
+
       // Create a render repaint boundary
       final renderRepaintBoundary = RenderRepaintBoundary();
 
       // Create constrained widget
       final constrainedWidget = ConstrainedBox(
-        constraints: BoxConstraints.tight(size),
+        constraints: BoxConstraints.tight(canvasSize),
         child: MediaQuery(
-          data: MediaQueryData(size: size, devicePixelRatio: pixelRatio),
+          data: MediaQueryData(size: canvasSize, devicePixelRatio: calculatedPixelRatio),
           child: Directionality(textDirection: TextDirection.ltr, child: widget),
         ),
       );
@@ -180,7 +192,12 @@ class ScreenshotManager {
       pipelineOwner.flushPaint();
 
       // Capture the image
-      final image = await renderRepaintBoundary.toImage(pixelRatio: pixelRatio);
+      final image = await renderRepaintBoundary.toImage(pixelRatio: calculatedPixelRatio);
+
+      // Verify the captured image size
+      debugPrint('Captured image size: ${image.width}x${image.height}');
+      debugPrint('Expected size: ${finalOutputSize.width.toInt()}x${finalOutputSize.height.toInt()}');
+
       final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
 
       // Cleanup
@@ -191,7 +208,7 @@ class ScreenshotManager {
     } catch (e) {
       debugPrint('Error in _directCaptureWidget: $e');
       // Fallback to a simpler method if the complex rendering fails
-      return await _fallbackCapture(widget, size, pixelRatio);
+      return await _fallbackCapture(widget, canvasSize, 3.0);
     }
   }
 
@@ -274,10 +291,23 @@ class ScreenshotManager {
           // Wait for rendering to complete
           await Future.delayed(const Duration(milliseconds: 500));
 
+          // Calculate the pixel ratio needed to get from canvas size to final output size
+          final finalOutputSize = deviceSpecs.imageSize;
+          final canvasSize = deviceSpecs.canvasSize;
+          final pixelRatioX = finalOutputSize.width / canvasSize.width;
+          final pixelRatioY = finalOutputSize.height / canvasSize.height;
+          final calculatedPixelRatio = (pixelRatioX + pixelRatioY) / 2;
+
+          debugPrint('CaptureWithContext - Size calculation:');
+          debugPrint('  canvasSize: $canvasSize');
+          debugPrint('  finalOutputSize: $finalOutputSize');
+          debugPrint('  calculatedPixelRatio: $calculatedPixelRatio');
+
           // Capture the image
           final boundary = globalKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
           if (boundary != null) {
-            final image = await boundary.toImage(pixelRatio: pixelRatio);
+            final image = await boundary.toImage(pixelRatio: calculatedPixelRatio);
+            debugPrint('CaptureWithContext - Captured image size: ${image.width}x${image.height}');
             final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
             completer.complete(byteData?.buffer.asUint8List());
           } else {

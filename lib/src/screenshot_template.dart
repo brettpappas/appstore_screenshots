@@ -84,16 +84,16 @@ class DeviceSpecs {
           imageSize: Size(2048, 2732), // App Store Connect 13" iPad
           deviceSize: Size(1024, 1366), // Logical size for 13" iPad
           deviceSizeScale: 0.8, // Device takes up 80% of canvas (larger device needs more spacing)
-          cornerRadius: 35,
+          cornerRadius: 50,
           shadowBlur: 40,
           shadowOffset: Offset(0, 20),
         );
       case DeviceType.android:
         return const DeviceSpecs(
-          imageSize: Size(1080, 1920), // Google Play Store Android
-          deviceSize: Size(443, 994), // Logical size for Android phone
+          imageSize: Size(1344, 2992), // Google Play Store Android
+          deviceSize: Size(448, 998), // Logical size for Android phone
           deviceSizeScale: 0.85, // Device takes up 85% of canvas
-          cornerRadius: 28,
+          cornerRadius: 38,
           shadowBlur: 25,
           shadowOffset: Offset(0, 12),
         );
@@ -182,7 +182,7 @@ class ScreenshotTemplateData {
   final bool showDeviceFrame;
 
   /// Device frame size (computed from device type)
-  // Removed duplicate deviceSize getter to avoid name conflict
+  Size get deviceFrameSize => DeviceSpecs.forDevice(deviceType).deviceSize;
 
   /// Canvas size (computed from device type and custom ratio if provided)
   Size get canvasSize {
