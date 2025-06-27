@@ -12,6 +12,8 @@ dependencies:
     sdk: flutter
   appstore_screenshots:
     path: ../
+  file_picker: ^8.1.2
+  share_plus: ^10.0.2
 
 dev_dependencies:
   flutter_test:

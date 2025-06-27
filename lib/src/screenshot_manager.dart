@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
+import 'package:archive/archive.dart';
 import 'models/screenshot_config.dart';
 import 'models/screen_config.dart';
 import 'screenshot_template.dart';
@@ -359,6 +360,207 @@ class ScreenshotManager {
     return results;
   }
 
+  /// Captures all screens and creates a ZIP file containing them
+  Future<String?> captureAllScreensAsZip({
+    String? outputPath,
+    double pixelRatio = 3.0,
+    String? zipFileName,
+    Function(String screenId, int current, int total)? onProgress,
+  }) async {
+    if (_config == null) {
+      throw Exception('No configuration set. Call configure() first.');
+    }
+
+    // Capture all screenshots first
+    final screenshotPaths = <String>[];
+    final total = _config!.screens.length;
+
+    for (int i = 0; i < _config!.screens.length; i++) {
+      final screen = _config!.screens[i];
+
+      // Call progress callback
+      onProgress?.call(screen.id, i + 1, total);
+
+      // Add delay between captures
+      if (i > 0 && _config!.captureDelay > 0) {
+        await Future.delayed(Duration(milliseconds: _config!.captureDelay));
+      }
+
+      final result = await captureScreen(screenConfig: screen, outputPath: outputPath, pixelRatio: pixelRatio);
+
+      if (result != null) {
+        screenshotPaths.add(result);
+      }
+    }
+
+    if (screenshotPaths.isEmpty) {
+      throw Exception('No screenshots were captured');
+    }
+
+    // Create ZIP file
+    return await createZipFromFiles(filePaths: screenshotPaths, outputPath: outputPath, zipFileName: zipFileName);
+  }
+
+  /// Captures all screens and creates a ZIP file containing them (context version)
+  Future<String?> captureAllScreensAsZipWithContext({
+    required BuildContext context,
+    String? outputPath,
+    double pixelRatio = 3.0,
+    String? zipFileName,
+    Function(String screenId, int current, int total)? onProgress,
+  }) async {
+    if (_config == null) {
+      throw Exception('No configuration set. Call configure() first.');
+    }
+
+    // Capture all screenshots first
+    final screenshotPaths = await captureAllScreensWithContext(
+      context: context,
+      outputPath: outputPath,
+      pixelRatio: pixelRatio,
+      onProgress: onProgress,
+    );
+
+    if (screenshotPaths.isEmpty) {
+      throw Exception('No screenshots were captured');
+    }
+
+    // Create ZIP file
+    return await createZipFromFiles(filePaths: screenshotPaths, outputPath: outputPath, zipFileName: zipFileName);
+  }
+
+  /// Creates a ZIP file from a list of file paths
+  Future<String?> createZipFromFiles({required List<String> filePaths, String? outputPath, String? zipFileName}) async {
+    try {
+      if (filePaths.isEmpty) {
+        throw Exception('No files provided to create ZIP');
+      }
+
+      // Determine output directory - use current directory if no path provider available
+      String directory;
+      if (outputPath != null) {
+        directory = outputPath;
+      } else {
+        try {
+          directory = await _getOutputDirectory();
+        } catch (e) {
+          // Fallback to current directory if path provider fails (e.g., in tests)
+          directory = Directory.current.path;
+        }
+      }
+
+      // Generate ZIP filename if not provided
+      final fileName = zipFileName ?? 'screenshots_${DateTime.now().millisecondsSinceEpoch}.zip';
+      final zipPath = path.join(directory, fileName);
+
+      // Create archive
+      final archive = Archive();
+
+      // Add each file to the archive
+      for (final filePath in filePaths) {
+        final file = File(filePath);
+        if (await file.exists()) {
+          final fileBytes = await file.readAsBytes();
+          final fileName = path.basename(filePath);
+
+          // Create archive file
+          final archiveFile = ArchiveFile(fileName, fileBytes.length, fileBytes);
+          archive.addFile(archiveFile);
+
+          debugPrint('Added $fileName to ZIP archive');
+        } else {
+          debugPrint('Warning: File not found: $filePath');
+        }
+      }
+
+      // Encode the archive as ZIP
+      final zipData = ZipEncoder().encode(archive);
+      if (zipData == null) {
+        throw Exception('Failed to create ZIP archive');
+      }
+
+      // Ensure output directory exists
+      final dirFile = Directory(directory);
+      if (!dirFile.existsSync()) {
+        dirFile.createSync(recursive: true);
+      }
+
+      // Save ZIP file
+      final zipFile = File(zipPath);
+      await zipFile.writeAsBytes(zipData);
+
+      debugPrint('ZIP file created successfully: $zipPath');
+      debugPrint('ZIP file size: ${(zipData.length / 1024).toStringAsFixed(1)} KB');
+      debugPrint('Contains ${archive.files.length} files');
+
+      return zipPath;
+    } catch (e) {
+      debugPrint('Error creating ZIP file: $e');
+      return null;
+    }
+  }
+
+  /// Creates a ZIP file from existing screenshots in a directory
+  Future<String?> createZipFromDirectory({
+    String? sourceDirectory,
+    String? outputPath,
+    String? zipFileName,
+    String filePattern = '*.png',
+  }) async {
+    try {
+      // Determine source directory
+      String srcDir;
+      if (sourceDirectory != null) {
+        srcDir = sourceDirectory;
+      } else {
+        try {
+          srcDir = await _getOutputDirectory();
+        } catch (e) {
+          // Fallback to current directory if path provider fails
+          srcDir = Directory.current.path;
+        }
+      }
+
+      final directory = Directory(srcDir);
+
+      if (!await directory.exists()) {
+        throw Exception('Source directory does not exist: $srcDir');
+      }
+
+      // Find all screenshot files
+      final files = await directory
+          .list()
+          .where((entity) => entity is File && entity.path.endsWith('.png'))
+          .cast<File>()
+          .toList();
+
+      if (files.isEmpty) {
+        throw Exception('No PNG files found in directory: $srcDir');
+      }
+
+      // Get file paths
+      final filePaths = files.map((file) => file.path).toList();
+
+      // Create ZIP file
+      return await createZipFromFiles(filePaths: filePaths, outputPath: outputPath, zipFileName: zipFileName);
+    } catch (e) {
+      debugPrint('Error creating ZIP from directory: $e');
+      return null;
+    }
+  }
+
+  /// Gets the output directory path
+  Future<String> _getOutputDirectory() async {
+    final directory = await getApplicationDocumentsDirectory();
+    final outputDir = Directory(path.join(directory.path, _config?.outputDirectory ?? 'screenshots'));
+
+    if (!outputDir.existsSync()) {
+      outputDir.createSync(recursive: true);
+    }
+
+    return outputDir.path;
+  }
+
   /// Creates a preview widget for a screen configuration
   Widget createPreview({required ScreenConfig screenConfig, double scale = 0.3}) {
     final templateName = screenConfig.templateName;
@@ -389,18 +591,6 @@ class ScreenshotManager {
     );
 
     return ScreenshotPreview(frame: frameWidget, scale: scale);
-  }
-
-  /// Gets the output directory path
-  Future<String> _getOutputDirectory() async {
-    final directory = await getApplicationDocumentsDirectory();
-    final outputDir = Directory(path.join(directory.path, _config?.outputDirectory ?? 'screenshots'));
-
-    if (!outputDir.existsSync()) {
-      outputDir.createSync(recursive: true);
-    }
-
-    return outputDir.path;
   }
 }
 

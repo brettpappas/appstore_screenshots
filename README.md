@@ -98,37 +98,67 @@ final config = ScreenshotConfig(
       screen: DashboardScreen(),
       title: 'Beautiful Dashboard',
       description: 'Manage everything from one place.',
-      backgroundColor: Color(0xFFFE9F1B),
-      templateName: 'minimal',
-      deviceType: DeviceType.ipad13, // iPad 13" (2048x2732)
-    ),
-    ScreenConfig(
-      id: 'welcome_android',
-      screen: WelcomeScreen(),
-      title: 'Amazing App for Android',
-      description: 'Now available on Google Play Store.',
-      backgroundColor: Color(0xFF2ECC71),
-      templateName: 'standard',
-      deviceType: DeviceType.android, // Android (1080x1920)
+      backgroundColor: Color(0xFFFF7675),
+      templateName: 'dynamic',
+      deviceType: DeviceType.ipad13, // iPad 13" format
     ),
   ],
-  outputDirectory: 'app_screenshots',
-  defaultTemplate: 'standard',
-  captureDelay: 1500, // Delay between captures
+  outputDirectory: 'app_store_screenshots',
+  captureDelay: 2000, // 2 seconds between captures
 );
 
-// Set configuration and capture all
 final manager = ScreenshotManager();
 manager.configure(config);
 
-final results = await manager.captureAllScreens(
+final results = await manager.captureAllScreensWithContext(
+  context: context,
   onProgress: (screenId, current, total) {
-    print('Capturing $screenId ($current/$total)');
+    print('Progress: $current/$total - $screenId');
   },
 );
 ```
 
-### 3. Preview Screenshots
+### 3. Download Screenshots as ZIP File
+
+Automatically create a ZIP file containing all captured screenshots:
+
+```dart
+final manager = ScreenshotManager();
+manager.configure(config);
+
+// Capture all screens and create a ZIP file
+final zipPath = await manager.captureAllScreensAsZipWithContext(
+  context: context,
+  zipFileName: 'my_app_screenshots.zip',
+  onProgress: (screenId, current, total) {
+    print('Capturing: $current/$total - $screenId');
+  },
+);
+
+if (zipPath != null) {
+  print('ZIP file created: $zipPath');
+  // The ZIP file contains all your screenshots ready for download
+}
+```
+
+You can also create a ZIP from existing screenshots:
+
+```dart
+// Create ZIP from files in a directory
+final zipPath = await manager.createZipFromDirectory(
+  sourceDirectory: 'screenshots',
+  zipFileName: 'app_store_screenshots.zip',
+);
+
+// Or create ZIP from specific file paths
+final screenshotPaths = ['screenshot1.png', 'screenshot2.png'];
+final zipPath = await manager.createZipFromFiles(
+  filePaths: screenshotPaths,
+  zipFileName: 'selected_screenshots.zip',
+);
+```
+
+### 4. Preview Screenshots
 
 ```dart
 // Create a preview widget
