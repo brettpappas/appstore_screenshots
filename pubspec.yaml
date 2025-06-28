@@ -1,6 +1,6 @@
 name: appstore_screenshots
 description: 'A Flutter package for automating app store screenshots with customizable backgrounds and templates.'
-version: 0.0.2
+version: 0.1.0
 homepage: https://3labs.app
 
 environment:
@@ -13,6 +13,8 @@ dependencies:
   path_provider: ^2.1.2
   path: ^1.8.3
   archive: ^3.4.10
+  file_picker: ^8.1.2
+  share_plus: ^10.0.2
 
 dev_dependencies:
   flutter_test:

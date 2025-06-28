@@ -3,10 +3,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:share_plus/share_plus.dart' as share_plus;
 import 'package:appstore_screenshots/appstore_screenshots.dart';
+import 'simple_dashboard_example.dart';
 
 /// Example demonstrating how to use the appstore_screenshots package
+///
+/// This example shows both the old approach (ScreenshotExample) and
+/// the new simplified approach using ScreenshotDashboard widget
 class ScreenshotExample extends StatefulWidget {
   const ScreenshotExample({super.key});
 
@@ -35,7 +39,7 @@ class _ScreenshotExampleState extends State<ScreenshotExample> {
     _screenConfigs = [
       ScreenConfig(
         id: 'welcome_iphone55',
-        screen: _buildWelcomeScreen(),
+        screen: WelcomeScreen(),
         title: Text(
           'iPhone 5.5"',
           style: TextStyle(fontSize: 48, fontWeight: FontWeight.w800, color: Colors.white),
@@ -52,7 +56,7 @@ class _ScreenshotExampleState extends State<ScreenshotExample> {
       ),
       ScreenConfig(
         id: 'welcome_iphone61_bottom_cutoff',
-        screen: _buildWelcomeScreen(),
+        screen: WelcomeScreen(),
         title: Text(
           'iPhone 6.1" Bottom Cutoff',
           style: TextStyle(fontSize: 48, fontWeight: FontWeight.w800, color: Colors.black, height: 1.1),
@@ -71,7 +75,7 @@ class _ScreenshotExampleState extends State<ScreenshotExample> {
       ),
       ScreenConfig(
         id: 'welcome_iphone61_top_cutoff',
-        screen: _buildWelcomeScreen(),
+        screen: WelcomeScreen(),
         backgroundColor: Colors.blue.shade200,
         deviceType: DeviceType.iphone61,
         deviceCanvasPosition: 0.5,
@@ -92,7 +96,7 @@ class _ScreenshotExampleState extends State<ScreenshotExample> {
       ),
       ScreenConfig(
         id: 'features_iphone67',
-        screen: _buildFeaturesScreen(),
+        screen: FeaturesScreen(),
         title: Text(
           'iPhone 6.7" Features',
           style: TextStyle(fontSize: 48, fontWeight: FontWeight.w700, color: Colors.black, height: 1.0),
@@ -112,7 +116,7 @@ class _ScreenshotExampleState extends State<ScreenshotExample> {
       ),
       ScreenConfig(
         id: 'dashboard_ipad',
-        screen: _buildDashboardScreen(),
+        screen: DashboardScreen(),
         title: Padding(
           padding: const EdgeInsets.only(top: 20),
           child: Text(
@@ -135,7 +139,7 @@ class _ScreenshotExampleState extends State<ScreenshotExample> {
       ),
       ScreenConfig(
         id: 'welcome_android',
-        screen: _buildWelcomeScreen(),
+        screen: WelcomeScreen(),
         title: Text(
           'Amazing App for Android',
           style: TextStyle(fontSize: 48, fontWeight: FontWeight.w700, color: Colors.white, height: 1.1),
@@ -173,12 +177,23 @@ class _ScreenshotExampleState extends State<ScreenshotExample> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // const Text(
-            //   'App Store Screenshot Generator',
-            //   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            //   textAlign: TextAlign.center,
-            // ),
-            // const SizedBox(height: 30),
+            // Button to show the new simplified dashboard
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => const SimpleDashboardExample()));
+              },
+              icon: const Icon(Icons.dashboard),
+              label: const Text('Show Simplified Dashboard (No Setup Required!)'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.purple.shade100,
+                foregroundColor: Colors.purple.shade800,
+              ),
+            ),
+
+            const SizedBox(height: 20),
+            const Divider(),
+            const Text('Original Screenshot Example', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
 
             // Preview Section
             const SizedBox(height: 16),
@@ -257,179 +272,6 @@ class _ScreenshotExampleState extends State<ScreenshotExample> {
               ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildWelcomeScreen() {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFF667eea), Color(0xFF764ba2)],
-        ),
-      ),
-      child: const SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.star, size: 80, color: Colors.white),
-            SizedBox(height: 30),
-            Text(
-              'Welcome!',
-              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white),
-            ),
-            SizedBox(height: 16),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 40),
-              child: Text(
-                'Get ready to experience something amazing',
-                style: TextStyle(fontSize: 18, color: Colors.white70),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFeaturesScreen() {
-    return Container(
-      color: Colors.grey[50],
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            children: [
-              const Text(
-                'Features',
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.black87),
-              ),
-              const SizedBox(height: 40),
-              Expanded(
-                child: ListView(
-                  children: [
-                    _buildFeatureItem(Icons.speed, 'Fast Performance', 'Lightning fast with optimized code'),
-                    _buildFeatureItem(Icons.security, 'Secure', 'Your data is protected with encryption'),
-                    _buildFeatureItem(Icons.cloud_sync, 'Cloud Sync', 'Sync across all your devices'),
-                    _buildFeatureItem(Icons.offline_bolt, 'Offline Mode', 'Works even without internet'),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFeatureItem(IconData icon, String title, String subtitle) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 20),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 2))],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: const Color(0xFF00B894).withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(icon, color: const Color(0xFF00B894), size: 24),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
-                ),
-                const SizedBox(height: 4),
-                Text(subtitle, style: TextStyle(fontSize: 14, color: Colors.grey[600])),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDashboardScreen() {
-    return Container(
-      color: Colors.white,
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Dashboard',
-                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.black87),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFE9F1B).withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Icon(Icons.notifications, color: Color(0xFFFE9F1B)),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 30),
-              Expanded(
-                child: GridView.count(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                  children: [
-                    _buildDashboardCard('Tasks', '24', Icons.check_circle, Colors.green),
-                    _buildDashboardCard('Projects', '8', Icons.folder, Colors.blue),
-                    _buildDashboardCard('Messages', '12', Icons.message, Colors.purple),
-                    _buildDashboardCard('Analytics', '1.2k', Icons.analytics, Colors.orange),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDashboardCard(String title, String value, IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withValues(alpha: 0.2)),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 32, color: color),
-          const SizedBox(height: 12),
-          Text(
-            value,
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: color),
-          ),
-          const SizedBox(height: 4),
-          Text(title, style: const TextStyle(fontSize: 14, color: Colors.black54)),
-        ],
       ),
     );
   }
@@ -931,15 +773,15 @@ class _ScreenshotExampleState extends State<ScreenshotExample> {
       final fileSizeKB = (fileSize / 1024).toStringAsFixed(1);
 
       // Create XFile for sharing
-      final xFile = XFile(zipPath, name: fileName, mimeType: 'application/zip');
+      final xFile = share_plus.XFile(zipPath, name: fileName, mimeType: 'application/zip');
 
       // Share the file with a custom message
-      final result = await Share.shareXFiles([xFile], subject: 'Screenshot Package');
+      final result = await share_plus.Share.shareXFiles([xFile], subject: 'Screenshot Package');
 
       debugPrint('📤 Share result: ${result.status}');
 
       if (mounted) {
-        if (result.status == ShareResultStatus.success) {
+        if (result.status == share_plus.ShareResultStatus.success) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Row(
@@ -962,7 +804,7 @@ class _ScreenshotExampleState extends State<ScreenshotExample> {
               duration: const Duration(seconds: 3),
             ),
           );
-        } else if (result.status == ShareResultStatus.dismissed) {
+        } else if (result.status == share_plus.ShareResultStatus.dismissed) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('📤 Share cancelled'),
@@ -1046,6 +888,225 @@ class _ScreenshotExampleState extends State<ScreenshotExample> {
   }
 }
 
+class FeaturesScreen extends StatelessWidget {
+  const FeaturesScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.grey[50],
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            children: [
+              const Text(
+                'Features',
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.black87),
+              ),
+              const SizedBox(height: 40),
+              Expanded(
+                child: ListView(
+                  children: [
+                    FeatureItem(
+                      icon: Icons.speed,
+                      title: 'Fast Performance',
+                      subtitle: 'Lightning fast with optimized code',
+                    ),
+                    FeatureItem(
+                      icon: Icons.security,
+                      title: 'Secure',
+                      subtitle: 'Your data is protected with encryption',
+                    ),
+                    FeatureItem(icon: Icons.cloud_sync, title: 'Cloud Sync', subtitle: 'Sync across all your devices'),
+                    FeatureItem(
+                      icon: Icons.offline_bolt,
+                      title: 'Offline Mode',
+                      subtitle: 'Works even without internet',
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class DashboardScreen extends StatelessWidget {
+  const DashboardScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.white,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Dashboard',
+                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.black87),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFE9F1B).withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.notifications, color: Color(0xFFFE9F1B)),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 30),
+              Expanded(
+                child: GridView.count(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                  children: [
+                    DashboardCard(title: 'Tasks', value: '24', icon: Icons.check_circle, color: Colors.green),
+                    DashboardCard(title: 'Projects', value: '8', icon: Icons.folder, color: Colors.blue),
+                    DashboardCard(title: 'Messages', value: '12', icon: Icons.message, color: Colors.purple),
+                    DashboardCard(title: 'Analytics', value: '1.2k', icon: Icons.analytics, color: Colors.orange),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class DashboardCard extends StatelessWidget {
+  const DashboardCard({super.key, required this.title, required this.value, required this.icon, required this.color});
+
+  final String title;
+  final String value;
+  final IconData icon;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 32, color: color),
+          const SizedBox(height: 12),
+          Text(
+            value,
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: color),
+          ),
+          const SizedBox(height: 4),
+          Text(title, style: const TextStyle(fontSize: 14, color: Colors.black54)),
+        ],
+      ),
+    );
+  }
+}
+
+class FeatureItem extends StatelessWidget {
+  const FeatureItem({super.key, required this.icon, required this.title, required this.subtitle});
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 2))],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFF00B894).withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: const Color(0xFF00B894), size: 24),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
+                ),
+                const SizedBox(height: 4),
+                Text(subtitle, style: TextStyle(fontSize: 14, color: Colors.grey[600])),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class WelcomeScreen extends StatelessWidget {
+  const WelcomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+        ),
+      ),
+      child: const SafeArea(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.star, size: 80, color: Colors.white),
+            SizedBox(height: 30),
+            Text(
+              'Welcome!',
+              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white),
+            ),
+            SizedBox(height: 16),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 40),
+              child: Text(
+                'Get ready to experience something amazing',
+                style: TextStyle(fontSize: 18, color: Colors.white70),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 void main() {
   runApp(const MyApp());
 }
@@ -1058,7 +1119,138 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'AppStore Screenshots Example',
       theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple), useMaterial3: true),
-      home: const ScreenshotExample(),
+      home: const MyScreenshotPage(),
     );
+  }
+}
+
+class MyScreenshotPage extends StatelessWidget {
+  const MyScreenshotPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    List<ScreenConfig> screenConfigs = [
+      ScreenConfig(
+        id: 'welcome_iphone55',
+        screen: WelcomeScreen(),
+        title: Text(
+          'iPhone 5.5"',
+          style: TextStyle(fontSize: 48, fontWeight: FontWeight.w800, color: Colors.white),
+        ),
+        description: Text(
+          'Experience amazing productivity.',
+          style: TextStyle(fontSize: 30, color: Colors.white),
+          textAlign: TextAlign.center,
+        ),
+        backgroundColor: Colors.amber,
+        deviceSizeScale: 0.75,
+        deviceType: DeviceType.iphone55,
+        showDeviceFrame: true,
+      ),
+      ScreenConfig(
+        id: 'welcome_iphone61_bottom_cutoff',
+        screen: WelcomeScreen(),
+        title: Text(
+          'iPhone 6.1" Bottom Cutoff',
+          style: TextStyle(fontSize: 48, fontWeight: FontWeight.w800, color: Colors.black, height: 1.1),
+          textAlign: TextAlign.center,
+        ),
+        description: Text(
+          'Device positioned with bottom cutoff effect.',
+          style: TextStyle(fontSize: 30, color: Colors.black, height: 1.1),
+          textAlign: TextAlign.center,
+        ),
+        backgroundColor: Colors.grey.shade300,
+        deviceType: DeviceType.iphone61,
+        deviceCanvasPosition: 0.75, // Device in bottom 75% of canvas
+        deviceAlignment: DeviceVerticalAlignment.bottom, // Align to bottom for cutoff effect
+        showDeviceFrame: true,
+      ),
+      ScreenConfig(
+        id: 'welcome_iphone61_top_cutoff',
+        screen: WelcomeScreen(),
+        backgroundColor: Colors.blue.shade200,
+        deviceType: DeviceType.iphone61,
+        deviceCanvasPosition: 0.5,
+        deviceAlignment: DeviceVerticalAlignment.top, // Align to top for cutoff effect
+        title: Text(
+          'Custom Title Widget',
+          style: TextStyle(fontSize: 48, fontWeight: FontWeight.w900, color: Colors.white, height: 1.1),
+          textAlign: TextAlign.center,
+        ),
+        description: Text(
+          'This uses a custom description widget with different styling and tighter spacing.',
+          style: TextStyle(fontSize: 38, color: Colors.white, height: 1.1, fontStyle: FontStyle.italic),
+          textAlign: TextAlign.center,
+          // maxLines: 2,
+          // overflow: TextOverflow.ellipsis,
+        ),
+        showDeviceFrame: true,
+      ),
+      ScreenConfig(
+        id: 'features_iphone67',
+        screen: FeaturesScreen(),
+        title: Text(
+          'iPhone 6.7" Features',
+          style: TextStyle(fontSize: 48, fontWeight: FontWeight.w700, color: Colors.black, height: 1.0),
+          textAlign: TextAlign.center,
+        ),
+        description: Text(
+          'Discover amazing features.',
+          style: TextStyle(fontSize: 30, color: Colors.black, height: 1.1),
+          textAlign: TextAlign.center,
+        ),
+        backgroundColor: const Color(0xFF00B894),
+        deviceType: DeviceType.iphone67,
+        deviceSizeScale: 0.95,
+        showDeviceFrame: true,
+        deviceAlignment: DeviceVerticalAlignment.bottom, // Center alignment for iPhone 6.7"
+        deviceCanvasPosition: 0.8, // Centered vertically
+      ),
+      ScreenConfig(
+        id: 'dashboard_ipad',
+        screen: DashboardScreen(),
+        title: Padding(
+          padding: const EdgeInsets.only(top: 20),
+          child: Text(
+            'Beautiful Dashboard',
+            style: TextStyle(fontSize: 72, fontWeight: FontWeight.w700, color: Colors.white, height: 1.1),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        description: Text(
+          'This is a custom description widget with different styling and tighter spacing.',
+          style: TextStyle(fontSize: 40, color: Colors.white, height: 1.1),
+          textAlign: TextAlign.center,
+        ),
+        backgroundColor: Colors.amber.shade700,
+        deviceType: DeviceType.ipad13,
+        showDeviceFrame: true,
+        deviceSizeScale: 0.8,
+        deviceCanvasPosition: 0.9,
+        deviceAlignment: DeviceVerticalAlignment.center, // Center alignment for iPad
+      ),
+      ScreenConfig(
+        id: 'welcome_android',
+        screen: WelcomeScreen(),
+        title: Text(
+          'Amazing App for Android',
+          style: TextStyle(fontSize: 48, fontWeight: FontWeight.w700, color: Colors.white, height: 1.1),
+          textAlign: TextAlign.center,
+        ),
+        description: Text(
+          'Now on Google Play Store.',
+          style: TextStyle(fontSize: 36, color: Colors.white, height: 1.1),
+          textAlign: TextAlign.center,
+        ),
+        backgroundColor: const Color(0xFF2ECC71),
+        deviceType: DeviceType.android,
+        deviceSizeScale: 0.75,
+        deviceAlignment: DeviceVerticalAlignment.center,
+        showDeviceFrame: true,
+      ),
+    ];
+
+    return ScreenshotDashboard(screenConfigs: screenConfigs);
   }
 }
