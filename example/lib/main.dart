@@ -6,6 +6,129 @@ import 'package:file_picker/file_picker.dart';
 import 'package:share_plus/share_plus.dart' as share_plus;
 import 'package:appstore_screenshots/appstore_screenshots.dart';
 import 'simple_dashboard_example.dart';
+import 'multi_language_screenshots.dart';
+
+List<ScreenConfig> _screenConfigs = [
+  ScreenConfig(
+    id: 'welcome_iphone55',
+    screen: WelcomeScreen(),
+    title: Text(
+      'iPhone 5.5"',
+      style: TextStyle(fontSize: 48, fontWeight: FontWeight.w800, color: Colors.white),
+    ),
+    description: Text(
+      'Experience amazing productivity.',
+      style: TextStyle(fontSize: 30, color: Colors.white),
+      textAlign: TextAlign.center,
+    ),
+    backgroundColor: Colors.amber,
+    deviceSizeScale: 0.75,
+    deviceType: DeviceType.iphone55,
+    showDeviceFrame: true,
+  ),
+  ScreenConfig(
+    id: 'welcome_iphone61_bottom_cutoff',
+    screen: WelcomeScreen(),
+    title: Text(
+      'iPhone 6.1" Bottom Cutoff',
+      style: TextStyle(fontSize: 48, fontWeight: FontWeight.w800, color: Colors.black, height: 1.1),
+      textAlign: TextAlign.center,
+    ),
+    description: Text(
+      'Device positioned with bottom cutoff effect.',
+      style: TextStyle(fontSize: 30, color: Colors.black, height: 1.1),
+      textAlign: TextAlign.center,
+    ),
+    backgroundColor: Colors.grey.shade300,
+    deviceType: DeviceType.iphone61,
+    deviceCanvasPosition: 0.75, // Device in bottom 75% of canvas
+    deviceAlignment: DeviceVerticalAlignment.bottom, // Align to bottom for cutoff effect
+    showDeviceFrame: true,
+  ),
+  ScreenConfig(
+    id: 'welcome_iphone61_top_cutoff',
+    screen: WelcomeScreen(),
+    backgroundColor: Colors.blue.shade200,
+    deviceType: DeviceType.iphone61,
+    deviceCanvasPosition: 0.5,
+    deviceAlignment: DeviceVerticalAlignment.top, // Align to top for cutoff effect
+    title: Text(
+      'Custom Title Widget',
+      style: TextStyle(fontSize: 48, fontWeight: FontWeight.w900, color: Colors.white, height: 1.1),
+      textAlign: TextAlign.center,
+    ),
+    description: Text(
+      'This uses a custom description widget with different styling and tighter spacing.',
+      style: TextStyle(fontSize: 38, color: Colors.white, height: 1.1, fontStyle: FontStyle.italic),
+      textAlign: TextAlign.center,
+      // maxLines: 2,
+      // overflow: TextOverflow.ellipsis,
+    ),
+    showDeviceFrame: true,
+  ),
+  ScreenConfig(
+    id: 'features_iphone67',
+    screen: FeaturesScreen(),
+    title: Text(
+      'iPhone 6.7" Features',
+      style: TextStyle(fontSize: 48, fontWeight: FontWeight.w700, color: Colors.black, height: 1.0),
+      textAlign: TextAlign.center,
+    ),
+    description: Text(
+      'Discover amazing features.',
+      style: TextStyle(fontSize: 30, color: Colors.black, height: 1.1),
+      textAlign: TextAlign.center,
+    ),
+    backgroundColor: const Color(0xFF00B894),
+    deviceType: DeviceType.iphone67,
+    deviceSizeScale: 0.95,
+    showDeviceFrame: true,
+    deviceAlignment: DeviceVerticalAlignment.bottom, // Center alignment for iPhone 6.7"
+    deviceCanvasPosition: 0.8, // Centered vertically
+  ),
+  ScreenConfig(
+    id: 'dashboard_ipad',
+    screen: DashboardScreen(),
+    title: Padding(
+      padding: const EdgeInsets.only(top: 20),
+      child: Text(
+        'Beautiful Dashboard',
+        style: TextStyle(fontSize: 72, fontWeight: FontWeight.w700, color: Colors.white, height: 1.1),
+        textAlign: TextAlign.center,
+      ),
+    ),
+    description: Text(
+      'This is a custom description widget with different styling and tighter spacing.',
+      style: TextStyle(fontSize: 40, color: Colors.white, height: 1.1),
+      textAlign: TextAlign.center,
+    ),
+    backgroundColor: Colors.amber.shade700,
+    deviceType: DeviceType.ipad13,
+    showDeviceFrame: true,
+    deviceSizeScale: 0.8,
+    deviceCanvasPosition: 0.9,
+    deviceAlignment: DeviceVerticalAlignment.center, // Center alignment for iPad
+  ),
+  ScreenConfig(
+    id: 'welcome_android',
+    screen: WelcomeScreen(),
+    title: Text(
+      'Amazing App for Android',
+      style: TextStyle(fontSize: 48, fontWeight: FontWeight.w700, color: Colors.white, height: 1.1),
+      textAlign: TextAlign.center,
+    ),
+    description: Text(
+      'Now on Google Play Store.',
+      style: TextStyle(fontSize: 36, color: Colors.white, height: 1.1),
+      textAlign: TextAlign.center,
+    ),
+    backgroundColor: const Color(0xFF2ECC71),
+    deviceType: DeviceType.android,
+    deviceSizeScale: 0.75,
+    deviceAlignment: DeviceVerticalAlignment.center,
+    showDeviceFrame: true,
+  ),
+];
 
 /// Example demonstrating how to use the appstore_screenshots package
 ///
@@ -21,7 +144,6 @@ class ScreenshotExample extends StatefulWidget {
 class _ScreenshotExampleState extends State<ScreenshotExample> {
   final ScreenshotManager _manager = ScreenshotManager();
   bool _isCapturing = false;
-  List<ScreenConfig> _screenConfigs = [];
 
   // Progress tracking
   int _currentProgress = 0;
@@ -36,128 +158,6 @@ class _ScreenshotExampleState extends State<ScreenshotExample> {
   }
 
   void _setupScreenshots() {
-    _screenConfigs = [
-      ScreenConfig(
-        id: 'welcome_iphone55',
-        screen: WelcomeScreen(),
-        title: Text(
-          'iPhone 5.5"',
-          style: TextStyle(fontSize: 48, fontWeight: FontWeight.w800, color: Colors.white),
-        ),
-        description: Text(
-          'Experience amazing productivity.',
-          style: TextStyle(fontSize: 30, color: Colors.white),
-          textAlign: TextAlign.center,
-        ),
-        backgroundColor: Colors.amber,
-        deviceSizeScale: 0.75,
-        deviceType: DeviceType.iphone55,
-        showDeviceFrame: true,
-      ),
-      ScreenConfig(
-        id: 'welcome_iphone61_bottom_cutoff',
-        screen: WelcomeScreen(),
-        title: Text(
-          'iPhone 6.1" Bottom Cutoff',
-          style: TextStyle(fontSize: 48, fontWeight: FontWeight.w800, color: Colors.black, height: 1.1),
-          textAlign: TextAlign.center,
-        ),
-        description: Text(
-          'Device positioned with bottom cutoff effect.',
-          style: TextStyle(fontSize: 30, color: Colors.black, height: 1.1),
-          textAlign: TextAlign.center,
-        ),
-        backgroundColor: Colors.grey.shade300,
-        deviceType: DeviceType.iphone61,
-        deviceCanvasPosition: 0.75, // Device in bottom 75% of canvas
-        deviceAlignment: DeviceVerticalAlignment.bottom, // Align to bottom for cutoff effect
-        showDeviceFrame: true,
-      ),
-      ScreenConfig(
-        id: 'welcome_iphone61_top_cutoff',
-        screen: WelcomeScreen(),
-        backgroundColor: Colors.blue.shade200,
-        deviceType: DeviceType.iphone61,
-        deviceCanvasPosition: 0.5,
-        deviceAlignment: DeviceVerticalAlignment.top, // Align to top for cutoff effect
-        title: Text(
-          'Custom Title Widget',
-          style: TextStyle(fontSize: 48, fontWeight: FontWeight.w900, color: Colors.white, height: 1.1),
-          textAlign: TextAlign.center,
-        ),
-        description: Text(
-          'This uses a custom description widget with different styling and tighter spacing.',
-          style: TextStyle(fontSize: 38, color: Colors.white, height: 1.1, fontStyle: FontStyle.italic),
-          textAlign: TextAlign.center,
-          // maxLines: 2,
-          // overflow: TextOverflow.ellipsis,
-        ),
-        showDeviceFrame: true,
-      ),
-      ScreenConfig(
-        id: 'features_iphone67',
-        screen: FeaturesScreen(),
-        title: Text(
-          'iPhone 6.7" Features',
-          style: TextStyle(fontSize: 48, fontWeight: FontWeight.w700, color: Colors.black, height: 1.0),
-          textAlign: TextAlign.center,
-        ),
-        description: Text(
-          'Discover amazing features.',
-          style: TextStyle(fontSize: 30, color: Colors.black, height: 1.1),
-          textAlign: TextAlign.center,
-        ),
-        backgroundColor: const Color(0xFF00B894),
-        deviceType: DeviceType.iphone67,
-        deviceSizeScale: 0.95,
-        showDeviceFrame: true,
-        deviceAlignment: DeviceVerticalAlignment.bottom, // Center alignment for iPhone 6.7"
-        deviceCanvasPosition: 0.8, // Centered vertically
-      ),
-      ScreenConfig(
-        id: 'dashboard_ipad',
-        screen: DashboardScreen(),
-        title: Padding(
-          padding: const EdgeInsets.only(top: 20),
-          child: Text(
-            'Beautiful Dashboard',
-            style: TextStyle(fontSize: 72, fontWeight: FontWeight.w700, color: Colors.white, height: 1.1),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        description: Text(
-          'This is a custom description widget with different styling and tighter spacing.',
-          style: TextStyle(fontSize: 40, color: Colors.white, height: 1.1),
-          textAlign: TextAlign.center,
-        ),
-        backgroundColor: Colors.amber.shade700,
-        deviceType: DeviceType.ipad13,
-        showDeviceFrame: true,
-        deviceSizeScale: 0.8,
-        deviceCanvasPosition: 0.9,
-        deviceAlignment: DeviceVerticalAlignment.center, // Center alignment for iPad
-      ),
-      ScreenConfig(
-        id: 'welcome_android',
-        screen: WelcomeScreen(),
-        title: Text(
-          'Amazing App for Android',
-          style: TextStyle(fontSize: 48, fontWeight: FontWeight.w700, color: Colors.white, height: 1.1),
-          textAlign: TextAlign.center,
-        ),
-        description: Text(
-          'Now on Google Play Store.',
-          style: TextStyle(fontSize: 36, color: Colors.white, height: 1.1),
-          textAlign: TextAlign.center,
-        ),
-        backgroundColor: const Color(0xFF2ECC71),
-        deviceType: DeviceType.android,
-        deviceSizeScale: 0.75,
-        deviceAlignment: DeviceVerticalAlignment.center,
-        showDeviceFrame: true,
-      ),
-    ];
-
     // Configure the screenshot manager with multiple screens for different device types
     final config = ScreenshotConfig(
       screens: _screenConfigs,
@@ -187,6 +187,23 @@ class _ScreenshotExampleState extends State<ScreenshotExample> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.purple.shade100,
                 foregroundColor: Colors.purple.shade800,
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
+            // Button to show multi-language screenshot example
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.of(
+                  context,
+                ).push(MaterialPageRoute(builder: (context) => const MultiLanguageScreenshotExample()));
+              },
+              icon: const Icon(Icons.language),
+              label: const Text('Multi-Language Screenshots'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue.shade100,
+                foregroundColor: Colors.blue.shade800,
               ),
             ),
 
@@ -230,19 +247,6 @@ class _ScreenshotExampleState extends State<ScreenshotExample> {
             ),
 
             const SizedBox(height: 20),
-
-            // Resolution Info Button
-            ElevatedButton.icon(
-              onPressed: _showScreenshotResolutions,
-              icon: const Icon(Icons.info_outline),
-              label: const Text('Show Resolution Info'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue.shade100,
-                foregroundColor: Colors.blue.shade800,
-              ),
-            ),
-
-            const SizedBox(height: 10),
 
             // Capture and ZIP Button
             ElevatedButton.icon(
@@ -533,97 +537,6 @@ class _ScreenshotExampleState extends State<ScreenshotExample> {
           ],
         );
       },
-    );
-  }
-
-  void _showScreenshotResolutions() {
-    // Build resolution information for all screens
-    final resolutionInfo = _screenConfigs.map((config) {
-      final specs = DeviceSpecs.forDevice(config.deviceType);
-      final deviceSizeScale = config.deviceSizeScale ?? specs.deviceSizeScale;
-      final canvasSize = Size(specs.deviceSize.width / deviceSizeScale, specs.deviceSize.height / deviceSizeScale);
-
-      return {
-        'id': config.id,
-        'device_name': _getDeviceTypeName(config.deviceType),
-        'output_resolution': '${specs.imageSize.width.toInt()} × ${specs.imageSize.height.toInt()}',
-        'canvas_size': '${canvasSize.width.toInt()} × ${canvasSize.height.toInt()}',
-        'device_size_scale': '${(deviceSizeScale * 100).toInt()}%',
-        'template': config.templateName,
-      };
-    }).toList();
-
-    // Show dialog with resolution information
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.info_outline, color: Colors.blue),
-            SizedBox(width: 8),
-            Text('Resolutions'),
-          ],
-        ),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Total Screenshots: ${resolutionInfo.length}',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-              const SizedBox(height: 16),
-              Flexible(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: resolutionInfo.length,
-                  itemBuilder: (context, index) {
-                    final info = resolutionInfo[index];
-                    return Card(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(info['id']!, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                            const SizedBox(height: 8),
-                            _buildInfoRow('Device:', info['device_name']!),
-                            _buildInfoRow('Canvas Size:', info['canvas_size']!),
-                            _buildInfoRow('Device Scale:', info['device_size_scale']!),
-                            _buildInfoRow('Output:', info['output_resolution']!),
-                            // _buildInfoRow('Template:', info['template']!),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-        actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Close'))],
-      ),
-    );
-  }
-
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 100,
-            child: Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
-          ),
-          Expanded(
-            child: Text(value, style: const TextStyle(fontSize: 12, fontFamily: 'monospace')),
-          ),
-        ],
-      ),
     );
   }
 
@@ -1129,128 +1042,6 @@ class MyScreenshotPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<ScreenConfig> screenConfigs = [
-      ScreenConfig(
-        id: 'welcome_iphone55',
-        screen: WelcomeScreen(),
-        title: Text(
-          'iPhone 5.5"',
-          style: TextStyle(fontSize: 48, fontWeight: FontWeight.w800, color: Colors.white),
-        ),
-        description: Text(
-          'Experience amazing productivity.',
-          style: TextStyle(fontSize: 30, color: Colors.white),
-          textAlign: TextAlign.center,
-        ),
-        backgroundColor: Colors.amber,
-        deviceSizeScale: 0.75,
-        deviceType: DeviceType.iphone55,
-        showDeviceFrame: true,
-      ),
-      ScreenConfig(
-        id: 'welcome_iphone61_bottom_cutoff',
-        screen: WelcomeScreen(),
-        title: Text(
-          'iPhone 6.1" Bottom Cutoff',
-          style: TextStyle(fontSize: 48, fontWeight: FontWeight.w800, color: Colors.black, height: 1.1),
-          textAlign: TextAlign.center,
-        ),
-        description: Text(
-          'Device positioned with bottom cutoff effect.',
-          style: TextStyle(fontSize: 30, color: Colors.black, height: 1.1),
-          textAlign: TextAlign.center,
-        ),
-        backgroundColor: Colors.grey.shade300,
-        deviceType: DeviceType.iphone61,
-        deviceCanvasPosition: 0.75, // Device in bottom 75% of canvas
-        deviceAlignment: DeviceVerticalAlignment.bottom, // Align to bottom for cutoff effect
-        showDeviceFrame: true,
-      ),
-      ScreenConfig(
-        id: 'welcome_iphone61_top_cutoff',
-        screen: WelcomeScreen(),
-        backgroundColor: Colors.blue.shade200,
-        deviceType: DeviceType.iphone61,
-        deviceCanvasPosition: 0.5,
-        deviceAlignment: DeviceVerticalAlignment.top, // Align to top for cutoff effect
-        title: Text(
-          'Custom Title Widget',
-          style: TextStyle(fontSize: 48, fontWeight: FontWeight.w900, color: Colors.white, height: 1.1),
-          textAlign: TextAlign.center,
-        ),
-        description: Text(
-          'This uses a custom description widget with different styling and tighter spacing.',
-          style: TextStyle(fontSize: 38, color: Colors.white, height: 1.1, fontStyle: FontStyle.italic),
-          textAlign: TextAlign.center,
-          // maxLines: 2,
-          // overflow: TextOverflow.ellipsis,
-        ),
-        showDeviceFrame: true,
-      ),
-      ScreenConfig(
-        id: 'features_iphone67',
-        screen: FeaturesScreen(),
-        title: Text(
-          'iPhone 6.7" Features',
-          style: TextStyle(fontSize: 48, fontWeight: FontWeight.w700, color: Colors.black, height: 1.0),
-          textAlign: TextAlign.center,
-        ),
-        description: Text(
-          'Discover amazing features.',
-          style: TextStyle(fontSize: 30, color: Colors.black, height: 1.1),
-          textAlign: TextAlign.center,
-        ),
-        backgroundColor: const Color(0xFF00B894),
-        deviceType: DeviceType.iphone67,
-        deviceSizeScale: 0.95,
-        showDeviceFrame: true,
-        deviceAlignment: DeviceVerticalAlignment.bottom, // Center alignment for iPhone 6.7"
-        deviceCanvasPosition: 0.8, // Centered vertically
-      ),
-      ScreenConfig(
-        id: 'dashboard_ipad',
-        screen: DashboardScreen(),
-        title: Padding(
-          padding: const EdgeInsets.only(top: 20),
-          child: Text(
-            'Beautiful Dashboard',
-            style: TextStyle(fontSize: 72, fontWeight: FontWeight.w700, color: Colors.white, height: 1.1),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        description: Text(
-          'This is a custom description widget with different styling and tighter spacing.',
-          style: TextStyle(fontSize: 40, color: Colors.white, height: 1.1),
-          textAlign: TextAlign.center,
-        ),
-        backgroundColor: Colors.amber.shade700,
-        deviceType: DeviceType.ipad13,
-        showDeviceFrame: true,
-        deviceSizeScale: 0.8,
-        deviceCanvasPosition: 0.9,
-        deviceAlignment: DeviceVerticalAlignment.center, // Center alignment for iPad
-      ),
-      ScreenConfig(
-        id: 'welcome_android',
-        screen: WelcomeScreen(),
-        title: Text(
-          'Amazing App for Android',
-          style: TextStyle(fontSize: 48, fontWeight: FontWeight.w700, color: Colors.white, height: 1.1),
-          textAlign: TextAlign.center,
-        ),
-        description: Text(
-          'Now on Google Play Store.',
-          style: TextStyle(fontSize: 36, color: Colors.white, height: 1.1),
-          textAlign: TextAlign.center,
-        ),
-        backgroundColor: const Color(0xFF2ECC71),
-        deviceType: DeviceType.android,
-        deviceSizeScale: 0.75,
-        deviceAlignment: DeviceVerticalAlignment.center,
-        showDeviceFrame: true,
-      ),
-    ];
-
-    return ScreenshotDashboard(screenConfigs: screenConfigs);
+    return ScreenshotDashboard(screenConfigs: _screenConfigs);
   }
 }
